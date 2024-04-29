@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Form</title>
+    <style>
+        .button {
+            padding: 10px 15px;
+            text-decoration: none;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<h2>Register Form</h2>
+<div>
+    <label for="reg-username">Username:</label>
+    <input type="text" id="reg-username" placeholder="Enter your username">
+    <label for="reg-password">Password:</label>
+    <input type="password" id="reg-password" placeholder="Enter your password">
+    <a onclick="register()" class="button">Register</a>
+    <!-- Add a login button -->
+    <a href="/" class="button">Login Here!</a>
+</div>
+</div>
+<p id="reg-message"></p> <!-- Display messages here -->
+
+<script>
+    function register() {
+        var username = document.getElementById('reg-username').value;
+        var password = document.getElementById('reg-password').value;
+        fetch('http://localhost:5000/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({username: username, password: password})
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Registration failed: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('reg-message').textContent = 'Registration successful!';
+                document.getElementById('reg-message').style.color = 'green';
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                document.getElementById('reg-message').textContent = error.message;
+                document.getElementById('reg-message').style.color = 'red';
+            });
+    }
+</script>
+</body>
+</html>
