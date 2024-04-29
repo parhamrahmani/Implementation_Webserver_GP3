@@ -75,7 +75,7 @@ export MYDB_PASS=password
 
 1. Create a new configuration file for the web app:
 ```bash
-sudo nano /etc/nginx/sites-available/webapp
+sudo nano /etc/nginx/sites-available/myflaskapp
 ```
 
 2. Add the following configuration to the file:
