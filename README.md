@@ -48,7 +48,7 @@ sudo mysql
 4. Create a new database:
    replace `mydb` with the name of your database and `admin` with the name of your user and `password` with the password of your user.
 ```sql
-CREATE DATABASE mydb2;
+CREATE DATABASE mydb;
 USE mydb;
 CREATE USER 'admin'@'localhost' IDENTIFIED BY 'password';
 CREATE TABLE credentials (
