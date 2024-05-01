@@ -9,6 +9,25 @@ app = Flask(__name__)
 # Enable CORS --> Cross-Origin Resource Sharing
 CORS(app)
 
+messages = []  # Keep this to store messages
+
+
+@app.route('/board', methods=['GET'])
+def get_messages():
+    return jsonify(messages)
+
+
+@app.route('/board', methods=['POST'])
+def post_message():
+    message = request.json.get('message', '')
+    messages.append(message)  # Append new message to list
+    return jsonify(messages)
+
+
+@app.route('/board_page')
+def board_page():
+    return send_from_directory(app.static_folder, 'board.html')
+
 
 # Serve static file for login and registration on localhost:5000/
 @app.route('/')
@@ -90,7 +109,7 @@ def register():
             cursor.execute(f"INSERT INTO credentials (user, password) VALUES ('{username}', '{password}')")
 
             # cursor.execute("INSERT INTO credentials (user, password) VALUES (%s, %s)",
-                       #    (username, password))
+            #    (username, password))
             connection.commit()
             return jsonify({'message': 'User created successfully'}), 201
     finally:
@@ -99,6 +118,7 @@ def register():
 
 # Vulnerable message board feature
 messages = []
+
 
 @app.route('/board', methods=['GET', 'POST'])
 def board():
@@ -119,6 +139,7 @@ def board():
             {% endfor %}
         </div>
     ''', messages=messages)
+
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=False)
