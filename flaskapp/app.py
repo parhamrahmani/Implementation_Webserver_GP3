@@ -56,6 +56,8 @@ def login():
     try:
         with connection.cursor() as cursor:
             # !! Vulnerable Code : SQL Injection !!
+            # # Hypothetical more vulnerable code
+            # cursor.execute(f"SELECT * FROM credentials WHERE user = '{username}'")
             cursor.execute("SELECT password FROM credentials WHERE user = %s", (username,))
             result = cursor.fetchone()
             if result and result['password'] == password:
@@ -78,11 +80,15 @@ def register():
     try:
         with connection.cursor() as cursor:
             # !! Vulnerable Code : SQL Injection !!
+            # # Hypothetical more vulnerable code
+            # cursor.execute(f"SELECT * FROM credentials WHERE user = '{username}'")
 
             cursor.execute("SELECT * FROM credentials WHERE user = %s", (username,))
             if cursor.fetchone():
                 return jsonify({'message': 'User already exists'}), 409
                 # !! Vulnerable Code : SQL Injection !!
+            # # Hypothetical more vulnerable code
+            # cursor.execute(f"INSERT INTO credentials (user, password) VALUES ('{username}', '{password}')")
 
             cursor.execute("INSERT INTO credentials (user, password) VALUES (%s, %s)",
                            (username, password))
