@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 import pymysql.cursors
 import os
-import bcrypt
 from flask_cors import CORS
 
 # Create an instance of the Flask class
@@ -24,9 +23,9 @@ def register_page():
     return send_from_directory('static', 'register.html')
 
 
-#get database connection
+# get database connection
 def get_db_connection():
-    password = os.getenv('MYDB_PASS')
+    password = os.getenv('MYDB_PASS', '#Pass@pass')  # Default password if env var is not set
     return pymysql.connect(host='localhost',
                            user='admin',
                            password=password,
@@ -59,14 +58,13 @@ def login():
     if not username or not password:
         return jsonify({'message': 'Username and password are required'}), 400
 
-    password = password.encode('utf-8')
     connection = get_db_connection()
 
     try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT password FROM credentials WHERE user = %s", (username,))
             result = cursor.fetchone()
-            if result and bcrypt.checkpw(password, result['password'].encode('utf-8')):
+            if result and result['password'] == password:
                 return jsonify({'message': 'Login successful'}), 200
             else:
                 return jsonify({'message': 'Invalid credentials'}), 401
@@ -81,8 +79,6 @@ def register():
     if not username or not password:
         return jsonify({'message': 'Username and password are required'}), 400
 
-    password = password.encode('utf-8')
-    hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
     connection = get_db_connection()
 
     try:
@@ -92,7 +88,7 @@ def register():
                 return jsonify({'message': 'User already exists'}), 409
 
             cursor.execute("INSERT INTO credentials (user, password) VALUES (%s, %s)",
-                           (username, hashed_password.decode('utf-8')))
+                           (username, password))
             connection.commit()
             return jsonify({'message': 'User created successfully'}), 201
     finally:
