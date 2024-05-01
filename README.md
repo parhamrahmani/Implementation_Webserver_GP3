@@ -22,6 +22,7 @@ sudo apt install nginx
 ```
 
 
+
 ## Database Configuration
 
 ### Install and Configure MySQL
