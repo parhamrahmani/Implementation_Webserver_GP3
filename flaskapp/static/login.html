@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login Form</title>
+    <title>Login and Register Form</title>
     <style>
         .button {
             padding: 10px 15px;
@@ -25,18 +25,15 @@
     <input type="text" id="username" placeholder="Enter your username">
     <label for="password">Password:</label>
     <input type="password" id="password" placeholder="Enter your password">
-    <a onclick="login()" class="button">Login</a>
-    <!-- Add a register button -->
-    <a href="/register" class="button">Register Here!</a>
+    <button onclick="login()" class="button">Login</button>
+    <button onclick="register()" class="button">Register</button>
 </div>
 <p id="message"></p> <!-- Display request response here -->
 
 <script>
     function login() {
-        //getting username and password from the form
         var username = document.getElementById('username').value;
         var password = document.getElementById('password').value;
-        // send a POST request to the login endpoint
         fetch('http://localhost:5000/login', {
             method: 'POST',
             headers: {
@@ -46,12 +43,39 @@
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Login failed: ' + response.status); // Throw an error for non-200 status codes
+                    throw new Error('Login failed: ' + response.status);
                 }
                 return response.json();
             })
             .then(data => {
                 document.getElementById('message').textContent = 'Login successful!';
+                document.getElementById('message').style.color = 'green';
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                document.getElementById('message').textContent = error.message;
+                document.getElementById('message').style.color = 'red';
+            });
+    }
+
+    function register() {
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+        fetch('http://localhost:5000/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({username: username, password: password})
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Registration failed: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('message').textContent = 'Registration successful!';
                 document.getElementById('message').style.color = 'green';
             })
             .catch((error) => {

@@ -16,11 +16,7 @@ pip3 install flask flask-cors
 ```bash
 pip3 install pymysql
 ```
-4. Install bcrypt for encryption of the passwords in the database
-```bash
-pip3 install bcrypt
-```
-5. Install nginx
+4. Install nginx
 ```bash
 sudo apt install nginx
 ```

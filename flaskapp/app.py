@@ -9,21 +9,13 @@ app = Flask(__name__)
 # Enable CORS --> Cross-Origin Resource Sharing
 CORS(app)
 
-
-# serve static file for login on localhost:5000/
+# Serve static file for login and registration on localhost:5000/
 @app.route('/')
 def home():
     print("Serving index.html from:", os.path.join(app.static_folder, 'index.html'))
     return send_from_directory(app.static_folder, 'login.html')
 
-
-# serve static file for register on localhost:5000/register
-@app.route('/register')
-def register_page():
-    return send_from_directory('static', 'register.html')
-
-
-# get database connection
+# Get database connection
 def get_db_connection():
     password = os.getenv('MYDB_PASS', '#Pass@pass')  # Default password if env var is not set
     return pymysql.connect(host='localhost',
@@ -32,9 +24,7 @@ def get_db_connection():
                            database='mydb',
                            cursorclass=pymysql.cursors.DictCursor)
 
-
-# test database connection
-# use curl localhost:5000/test_db for testing
+# Test database connection
 @app.route('/test_db')
 def test_db():
     connection = None
@@ -49,7 +39,6 @@ def test_db():
     finally:
         if connection:
             connection.close()
-
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -70,7 +59,6 @@ def login():
                 return jsonify({'message': 'Invalid credentials'}), 401
     finally:
         connection.close()
-
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -93,7 +81,6 @@ def register():
             return jsonify({'message': 'User created successfully'}), 201
     finally:
         connection.close()
-
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=False)
