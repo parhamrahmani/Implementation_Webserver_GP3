@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, render_template_string
 import pymysql.cursors
 import os
 from flask_cors import CORS
@@ -22,7 +22,7 @@ def get_db_connection():
     password = os.getenv('MYDB_PASS', 'your_password')  # In case that environment variable is not set
     return pymysql.connect(host='localhost',
                            user='admin',
-                           password=password,
+                           password='#Pass@pass',
                            database='mydb',
                            cursorclass=pymysql.cursors.DictCursor)
 
@@ -96,6 +96,29 @@ def register():
     finally:
         connection.close()
 
+
+# Vulnerable message board feature
+messages = []
+
+@app.route('/board', methods=['GET', 'POST'])
+def board():
+    if request.method == 'POST':
+        message = request.form.get('message', '')
+        messages.append(message)  # Store messages without sanitizing
+
+    return render_template_string('''
+        <h1>Message Board</h1>
+        <form method="post">
+            <input type="text" name="message" placeholder="Enter your message">
+            <input type="submit" value="Post">
+        </form>
+        <h2>Messages:</h2>
+        <div>
+            {% for msg in messages %}
+            <div>{{ msg|safe }}</div>  <!-- Intentionally marked as safe, which allows for XSS -->
+            {% endfor %}
+        </div>
+    ''', messages=messages)
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=False)
