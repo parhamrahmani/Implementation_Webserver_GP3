@@ -3,13 +3,9 @@ import pymysql.cursors
 import os
 from flask_cors import CORS
 
-# Create an instance of the Flask class
 app = Flask(__name__)
-
-# Enable CORS --> Cross-Origin Resource Sharing
 CORS(app)
-
-messages = []  # Keep this to store messages
+messages = []
 
 
 @app.route('/board', methods=['GET'])
@@ -38,10 +34,10 @@ def home():
 
 # Get database connection
 def get_db_connection():
-    password = os.getenv('MYDB_PASS', 'your_password')  # In case that environment variable is not set
+    password = os.getenv('MYDB_PASS', '#Pass@pass')  # In case that environment variable is not set
     return pymysql.connect(host='localhost',
                            user='admin',
-                           password='#Pass@pass',
+                           password=password,
                            database='mydb',
                            cursorclass=pymysql.cursors.DictCursor)
 
@@ -114,31 +110,6 @@ def register():
             return jsonify({'message': 'User created successfully'}), 201
     finally:
         connection.close()
-
-
-# Vulnerable message board feature
-messages = []
-
-
-@app.route('/board', methods=['GET', 'POST'])
-def board():
-    if request.method == 'POST':
-        message = request.form.get('message', '')
-        messages.append(message)  # Store messages without sanitizing
-
-    return render_template_string('''
-        <h1>Message Board</h1>
-        <form method="post">
-            <input type="text" name="message" placeholder="Enter your message">
-            <input type="submit" value="Post">
-        </form>
-        <h2>Messages:</h2>
-        <div>
-            {% for msg in messages %}
-            <div>{{ msg|safe }}</div>  <!-- Intentionally marked as safe, which allows for XSS -->
-            {% endfor %}
-        </div>
-    ''', messages=messages)
 
 
 if __name__ == '__main__':
