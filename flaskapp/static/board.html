@@ -34,14 +34,7 @@
                 // innerHtml parses text into html and executes it --> using <script> tag we can execute javascript code
                 messages.forEach(msg => {
                     const div = document.createElement('div');
-                    if (msg.toLowerCase().includes('<script>')) {
-                        // Executing script tags dynamically
-                        const script = document.createElement('script');
-                        script.textContent = msg.substring(msg.indexOf('>') + 1, msg.lastIndexOf('<'));
-                        div.appendChild(script);
-                    } else {
-                        div.innerHTML = msg;
-                    }
+                    div.innerHTML = msg;
                     container.appendChild(div);
                 });
                 document.getElementById('messageInput').value = '';  // Clear input after posting
