@@ -30,8 +30,7 @@
             .then(messages => {
                 const container = document.getElementById('messagesContainer');
                 container.innerHTML = '';  // Clear current messages
-                // vulnerabilities: XSS why? because we are using innerHTML to render the messages -->
-                // innerHtml parses text into html and executes it --> using <script> tag we can execute javascript code
+                // vulnerabilities: XSS why? because we are using innerHTML to render the messages 
                 messages.forEach(msg => {
                     const div = document.createElement('div');
                     div.innerHTML = msg;
