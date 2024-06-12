@@ -3,17 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <title>Message Board</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #fff;
+            color: #000;
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            text-align: left;
+            padding: 10px 20px;
+            border-bottom: 1px solid #000;
+        }
+        #boardContainer {
+            width: 100%;
+            padding: 10px 20px;
+        }
+        #messageForm {
+            margin-bottom: 20px;
+        }
+        #messageInput {
+            width: calc(100% - 80px);
+            padding: 5px;
+            border: 1px solid #000;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            color: #000;
+        }
+        #messageForm button {
+            padding: 5px 10px;
+            border: 1px solid #000;
+            border-radius: 4px;
+            background-color: #fff;
+            color: #000;
+            cursor: pointer;
+        }
+        #messageForm button:hover {
+            background-color: #f0f0f0;
+        }
+        #messagesContainer {
+            background-color: #fff;
+            padding: 10px 0;
+        }
+        .message {
+            padding: 5px;
+            border-left: 5px solid;
+            margin-bottom: 5px;
+            color: #000;
+            background-color: #fff;
+        }
+        .message b {
+            margin-right: 10px;
+            color: inherit;
+        }
+    </style>
 </head>
 <body>
-<h1 id="welcomeMessage">Welcome</h1>
-<h1>Message Board</h1>
-<form id="messageForm">
-    <input type="text" id="messageInput" placeholder="Enter your message">
-    <button type="submit">Post</button>
-</form>
-<h2>Messages:</h2>
-<div id="messagesContainer">
-    <!-- Messages will be dynamically loaded here -->
+<header>
+    <h1 id="welcomeMessage">Welcome</h1>
+    <h2>Message Board</h2>
+</header>
+<div id="boardContainer">
+    <form id="messageForm">
+        <input type="text" id="messageInput" placeholder="Enter your message">
+        <button type="submit">Post</button>
+    </form>
+    <div id="messagesContainer">
+        <!-- Messages will be dynamically loaded here -->
+    </div>
 </div>
 
 <script>
@@ -25,6 +83,24 @@
 
     const username = getUsernameFromURL();
     document.getElementById('welcomeMessage').textContent = `Welcome ${username}`;
+
+    const userColors = {};
+
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function getUserColor(user) {
+        if (!userColors[user]) {
+            userColors[user] = getRandomColor();
+        }
+        return userColors[user];
+    }
 
     document.getElementById('messageForm').addEventListener('submit', function(event) {
         event.preventDefault();
@@ -43,6 +119,8 @@
             container.innerHTML = '';  // Clear current messages
             messages.forEach(msg => {
                 const div = document.createElement('div');
+                div.classList.add('message');
+                div.style.borderColor = getUserColor(msg.username);
                 div.innerHTML = `<b>${msg.username}:</b> ${msg.message}`;
                 container.appendChild(div);
             });
@@ -58,6 +136,8 @@
             const container = document.getElementById('messagesContainer');
             messages.forEach(msg => {
                 const div = document.createElement('div');
+                div.classList.add('message');
+                div.style.borderColor = getUserColor(msg.username);
                 div.innerHTML = `<b>${msg.username}:</b> ${msg.message}`;  // Vulnerability: Using innerHTML allows XSS
                 container.appendChild(div);
             });
