@@ -5,6 +5,7 @@
     <title>Message Board</title>
 </head>
 <body>
+<h1 id="welcomeMessage">Welcome</h1>
 <h1>Message Board</h1>
 <form id="messageForm">
     <input type="text" id="messageInput" placeholder="Enter your message">
@@ -16,42 +17,48 @@
 </div>
 
 <script>
+    function getUsernameFromURL() {
+        const path = window.location.pathname;
+        const parts = path.split('/');
+        return parts[parts.length - 1];
+    }
+
+    const username = getUsernameFromURL();
+    document.getElementById('welcomeMessage').textContent = `Welcome ${username}`;
+
     document.getElementById('messageForm').addEventListener('submit', function(event) {
         event.preventDefault();
         const message = document.getElementById('messageInput').value;
-        fetch('/board', {
+        fetch(`/board/${username}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ message: message })
+            body: JSON.stringify({ message: message }),
+            credentials: 'same-origin' // Ensure cookies are sent
         })
-            .then(response => response.json())
-            .then(messages => {
-                const container = document.getElementById('messagesContainer');
-                container.innerHTML = '';  // Clear current messages
-                // vulnerabilities: XSS why? because we are using innerHTML to render the messages 
-                messages.forEach(msg => {
-                    const div = document.createElement('div');
-                    div.innerHTML = msg;
-                    container.appendChild(div);
-                });
-                document.getElementById('messageInput').value = '';  // Clear input after posting
-            })
-            .catch(error => console.error('Failed to post message:', error));
-    });
-
-    // Load messages on page load
-    fetch('/board')
         .then(response => response.json())
         .then(messages => {
             const container = document.getElementById('messagesContainer');
-            // vulnerabilities: XSS
-            // how to avoid? use textContent instead of innerHTML or sanitize the input using DOMPurify or similar library
-
+            container.innerHTML = '';  // Clear current messages
             messages.forEach(msg => {
                 const div = document.createElement('div');
-                div.innerHTML = msg;  // Vulnerability: Using innerHTML allows XSS
+                div.innerHTML = `<b>${msg.username}:</b> ${msg.message}`;
+                container.appendChild(div);
+            });
+            document.getElementById('messageInput').value = '';  // Clear input after posting
+        })
+        .catch(error => console.error('Failed to post message:', error));
+    });
+
+    // Load messages on page load
+    fetch(`/board/${username}`, { credentials: 'same-origin' })
+        .then(response => response.json())
+        .then(messages => {
+            const container = document.getElementById('messagesContainer');
+            messages.forEach(msg => {
+                const div = document.createElement('div');
+                div.innerHTML = `<b>${msg.username}:</b> ${msg.message}`;  // Vulnerability: Using innerHTML allows XSS
                 container.appendChild(div);
             });
         })
