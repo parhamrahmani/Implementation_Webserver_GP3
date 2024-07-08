@@ -1,5 +1,6 @@
 
-# Setting up the Web App for the IT security session
+# Unsecure Message Board
+This is a intentionally unsecure Flask Application with vulnerablilities that can be used for pentesting. Do the following steps to test this unsecure web app.  
 
 ## Installing prerequisites
 Assuming you have a Debian-based system, you can install the required packages by running the following command:
